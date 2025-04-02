@@ -1,11 +1,13 @@
 from flask import Flask, request, jsonify, render_template, redirect, url_for
 import sqlite3
 from openai import OpenAI
-from api_key import OPENAI_API_KEY  # Import the API key from the new file
 
 app = Flask(__name__)
 
-# Initialize OpenAI
+###########################
+                    #####
+OPENAI_API_KEY = "PASTE HERE"
+
 client = OpenAI(api_key=OPENAI_API_KEY)
 
 def init_db():
@@ -39,7 +41,7 @@ def check_in_book(book_id):
             return f"✅ Book with ID {book_id} has been returned."
         return "❌ Book is already available or does not exist."
 
-# Functions to interact with the database
+
 def add_book(title, author):
     with sqlite3.connect("library.db") as conn:
         cursor = conn.cursor()
@@ -192,7 +194,7 @@ def api_add_book():
     author = data.get("author")
     if title and author:
         add_book(title, author)
-        return redirect(url_for('index'))  # Redirect to the main page
+        return redirect(url_for('index'))
     return jsonify(error="Title and author are required."), 400
 
 @app.route('/api/books/<int:book_id>', methods=['POST'])
@@ -200,27 +202,26 @@ def api_update_or_delete_book(book_id):
     method = request.form.get("_method")
     if method == "DELETE":
         delete_book(book_id)
-        return redirect(url_for('index'))  # Redirect to the main page
+        return redirect(url_for('index'))
     elif method == "PUT":
         title = request.form.get("title")
         author = request.form.get("author")
         if title and author:
             update_book(book_id, title, author)
-            return redirect(url_for('index'))  # Redirect to the main page
+            return redirect(url_for('index'))
         return jsonify(error="Title and author are required."), 400
     return jsonify(error="Invalid method."), 400
 
 @app.route('/api/books/<int:book_id>/checkout', methods=['POST'])
 def api_check_out_book(book_id):
     message = check_out_book(book_id)
-    return redirect(url_for('index'))  # Redirect to the main page
+    return redirect(url_for('index'))
 
 @app.route('/api/books/<int:book_id>/checkin', methods=['POST'])
 def api_check_in_book(book_id):
     message = check_in_book(book_id)
-    return redirect(url_for('index'))  # Redirect to the main page
+    return redirect(url_for('index'))
 
-# Initialize database and run app
 if __name__ == "__main__":
     init_db()
     app.run(debug=True)
