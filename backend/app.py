@@ -1,12 +1,11 @@
-from flask import Flask, request, jsonify, render_template,redirect, url_for
-
+from flask import Flask, request, jsonify, render_template, redirect, url_for
 import sqlite3
 from openai import OpenAI
+from api_key import OPENAI_API_KEY  # Import the API key from the new file
 
 app = Flask(__name__)
 
 # Initialize OpenAI
-OPENAI_API_KEY = "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"
 client = OpenAI(api_key=OPENAI_API_KEY)
 
 def init_db():
