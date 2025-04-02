@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        main {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2 {
+            color: #4CAF50;
+        }
+
+        /* Form Styles */
+        form {
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Status Colors */
+        .status-available {
+            color: blue;
+            font-weight: bold;
+        }
+
+        .status-borrowed {
+            color: red;
+            font-weight: bold;
+        }
+
+        /* Chatbox Styles */
+        #chatbox {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 20px;
+            height: 200px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+
+        #chatbox div {
+            margin-bottom: 10px;
+        }
+
+        #chatbox .user {
+            text-align: right;
+            color: #4CAF50;
+        }
+
+        #chatbox .bot {
+            text-align: left;
+            color: #333;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Library Management System</h1>
+    </header>
+    <main>
+        <!-- Form to manually add a new book -->
+        <h2>Add a New Book</h2>
+        <form id="addBookForm" action="/api/books" method="POST">
+            <input type="text" name="title" placeholder="Book Title" required>
+            <input type="text" name="author" placeholder="Author" required>
+            <button type="submit">Add Book</button>
+        </form>
+
+        <h2>Search Books</h2>
+        <form action="/search" method="GET" style="margin-bottom: 20px; display: flex; gap: 10px;">
+            <input type="text" name="query" placeholder="Search..." required>
+            <select name="filter_by">
+                <option value="title">Title</option>
+                <option value="author">Author</option>
+                <option value="status">Status</option>
+            </select>
+            <button type="submit">Search</button>
+            <!-- Show All Button -->
+            <a href="/" style="text-decoration: none;">
+                <button type="button" style="background-color: #007BFF; color: white;">Show All</button>
+            </a>
+</form>
+
+        <!-- Table to display books -->
+        <h2>Books in the Library</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for book in library %}
+                <tr>
+                    <td>{{ book.id }}</td>
+                    <td>{{ book.title }}</td>
+                    <td>{{ book.author }}</td>
+                    <td>
+                        {% if book.status == 'available' %}
+                        <span class="status-available">Checked In</span>
+                        {% elif book.status == 'borrowed' %}
+                        <span class="status-borrowed">Checked Out</span>
+                        {% endif %}
+                    </td>
+                    <td class="actions">
+                        <!-- Check-Out Button -->
+                        {% if book.status == 'available' %}
+                        <form action="/api/books/{{ book.id }}/checkout" method="POST" style="display:inline;">
+                            <button type="submit">Check Out</button>
+                        </form>
+                        {% endif %}
+                        <!-- Check-In Button -->
+                        {% if book.status == 'borrowed' %}
+                        <form action="/api/books/{{ book.id }}/checkin" method="POST" style="display:inline;">
+                            <button type="submit">Check In</button>
+                        </form>
+                        {% endif %}
+                        <!-- Delete Book -->
+                        <form action="/api/books/{{ book.id }}" method="POST" style="display:inline;">
+                            <input type="hidden" name="_method" value="DELETE">
+                            <button type="submit">Delete</button>
+                        </form>
+                        <!-- Update Book -->
+                        <form action="/api/books/{{ book.id }}" method="POST" style="display:inline;">
+                            <input type="hidden" name="_method" value="PUT">
+                            <input type="text" name="title" placeholder="New Title" required>
+                            <input type="text" name="author" placeholder="New Author" required>
+                            <button type="submit">Update</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Chat interface -->
+        <h2>Library AI Assistant</h2>
+        <form method="POST" action="/">
+            <div id="chatbox">
+                {% for message in chat_history %}
+                    <div class="{{ message.role }}">{{ message.content }}</div>
+                {% endfor %}
+            </div>
+            <input type="text" name="message" placeholder="Ask the AI to manage books..." required>
+            <button type="submit">Send</button>
+        </form>
+    </main>
+    <footer>
+        <p>&copy; 2025 Library Management System</p>
+    </footer>
+</body>
+</html>
