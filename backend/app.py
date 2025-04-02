@@ -6,7 +6,7 @@ from openai import OpenAI
 app = Flask(__name__)
 
 # Initialize OpenAI
-OPENAI_API_KEY = "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"
+OPENAI_API_KEY = "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"
 client = OpenAI(api_key=OPENAI_API_KEY)
 
 def init_db():
