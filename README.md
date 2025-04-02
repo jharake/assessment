@@ -1,6 +1,7 @@
 # Library Management System
 
-run app.py and enter localhost
+## Ensure you paste the API key sent to your email into the `app.py` file.
+## Run app.py and enter localhost
 
 A web-based application for managing a library's collection of books. This system allows users to add, update, delete, search, and manage the status of books (Checked In/Checked Out).
 
